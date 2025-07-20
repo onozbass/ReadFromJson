@@ -12,13 +12,13 @@ const api_configs = [
         "id": "user_list",
         "method": "GET",
         "url": "https://example.com/api/user/list",
-        "options": "?maxResult=100"
+        "options": "?maxResult=100?cursor="
     },
     {
         "id": "content_list",
         "method": "POST",
         "url": "https://example.com/api/content/list",
-        "options": "?maxResult=100",
+        "options": "?maxResult=100?cursor=",
         "body" : "application/json"
     }
 ];
@@ -33,17 +33,18 @@ function getToken() {
 };
 
 // 3.データ取得関数定義
-function retrieveData(_token, _config) {
-    console.log(`▪️▪️▪️ Initiate retrieval of ${_config.id} ... ▪️▪️▪️`);
-    console.log(_token);
-    console.log(`HTTP Method: ${_config.method}`);
-    console.log(`API Endpoint URL: ${_config.url}${_config.options}`);
-    console.log(`File Name: ${_config.id}.json`);
-    _config.method === "POST" ? console.log(`Body: ${_config.body}`) : null;
-    console.log(`▪️▪️▪️ Complete retrieval of ${_config.id} ! ▪️▪️▪️`);
+function retrieveData(token, config) {
+    console.log(`*** Initiate retrieval of ${config.id} ... ***`);
+    console.log(`HTTP Method: ${config.method}`);
+    console.log(`API Endpoint URL: ${config.url}${config.options}`);
+    console.log(`File Name: ${config.id}.json`);
+    config.method === "POST" ? console.log(`Body: ${config.body}`) : null;
+    console.log(`*** Complete retrieval of ${config.id} ! ***\n`);
 };
 
 // 4.メイン処理実行
 const token = getToken();
+console.log(`Token: ${token}\n`);
+
 retrieveData(token, getConfigById('user_list'));
 retrieveData(token, getConfigById('content_list'));
