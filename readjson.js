@@ -12,15 +12,13 @@ const api_configs = [
         "id": "user_list",
         "method": "GET",
         "url": "https://example.com/api/user/list",
-        "options": "?maxResult=100",
-        "filename": "user_list.json"
+        "options": "?maxResult=100"
     },
     {
         "id": "content_list",
         "method": "POST",
         "url": "https://example.com/api/content/list",
-        "options": "?maxResult=100",
-        "filename": "content_list.json"
+        "options": "?maxResult=100"
     }
 ];
 
@@ -28,28 +26,22 @@ function getConfigById(id) {
     return api_configs.find(config => config.id === id);
 }
 
-/* // 使用例
-let config;
-config = getConfigById('user_list');
-console.log(config.method);
-console.log(config.url + config.options);
-console.log(config.filename);
-
-config = getConfigById('content_list');
-console.log(config.method);
-console.log(config.url + config.options);
-console.log(config.filename); */
-
 // 2.トークン取得関数定義
 function getToken() {
-    return "token";
+    return "token_string";
 };
 
 // 3.データ取得関数定義
 function retrieveData(_token, _config) {
-    console.log("データ取得実行");
+    console.log("データ取得開始");
     console.log(_token);
     console.log(_config);
+    console.log("ID: " + _config.id);
+    console.log("HTTP Method: " + _config.method);
+    console.log("API Endpoint URL: " + _config.url);
+    console.log("API Options: " + _config.options);
+    console.log("File Name: " + _config.id + ".json");
+    console.log("データ取得終了");
 };
 
 // 4.メイン処理実行
