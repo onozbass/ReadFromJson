@@ -7,7 +7,7 @@
 */
 
 // 1.コンフィグJSON定義
-const configs = [
+const api_configs = [
     {
         "id": "user_list",
         "method": "GET",
@@ -25,7 +25,7 @@ const configs = [
 ];
 
 function getConfigById(id) {
-    return configs.find(config => config.id === id);
+    return api_configs.find(config => config.id === id);
 }
 
 /* // 使用例
@@ -46,7 +46,7 @@ function getToken() {
 };
 
 // 3.データ取得関数定義
-function main(_token, _config) {
+function retrieveData(_token, _config) {
     console.log("データ取得実行");
     console.log(_token);
     console.log(_config);
@@ -54,6 +54,5 @@ function main(_token, _config) {
 
 // 4.メイン処理実行
 const token = getToken();
-config = getConfigById('user_list');
-main(token, config);
-main(token, getConfigById('content_list'));
+retrieveData(token, getConfigById('user_list'));
+retrieveData(token, getConfigById('content_list'));

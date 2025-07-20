@@ -3,64 +3,64 @@
         "id": "site_list",
         "method": "GET",
         "url": "https://ms-cell-002.api.lumapps.com/_ah/api/lumsites/v1/instance/list",
-        "options": "?maxResults=100&cursor=",
-        "filename": "site_list.json"
+        "options": "?maxResults=100&cursor="
     },
     {
         "id": "contents_list",
         "method": "POST",
         "url": "https://ms-cell-002.api.lumapps.com/_ah/api/lumsites/v1/content/list",
         "options": "?cursor=",
-        "body": {"lang":"en","instanceId":["5730423981211648"],"maxResults":100,"status":["LIVE"]},
-        "filename": "contents_list.json"
+        "body": {
+            "lang": "en",
+            "instanceId": [
+                "5730423981211648"
+            ],
+            "maxResults": 100,
+            "status": [
+                "LIVE"
+            ]
+        }
     },
     {
         "id": "content_types_list",
         "method": "GET",
         "url": "https://ms-cell-002.api.lumapps.com/_ah/api/lumsites/v1/customcontenttype/list",
-        "options": "?instance=",
-        "filename": "content_types_list.json"
+        "options": "?instance="
     },
     {
         "id": "content_type_tags_list",
         "method": "GET",
         "url": "https://ms-cell-002.api.lumapps.com/_ah/api/lumsites/v1/customcontenttype/tag/list",
-        "options": "?uid=",
-        "filename": "content_type_tags_list.json"
+        "options": "?uid="
     },
     {
         "id": "metadata_list",
         "method": "GET",
         "url": "https://ms-cell-002.api.lumapps.com/_ah/api/lumsites/v1/metadata/list",
-        "options": "?maxResults=100&cursor=",
-        "filename": "metadata_list.json"
+        "options": "?maxResults=100&cursor="
     },
     {
         "id": "site_metadata_list",
         "method": "GET",
         "url": "https://ms-cell-002.api.lumapps.com/_ah/api/lumsites/v1/instance/metadata/list",
-        "options": "?maxResults=100&cursor=",
-        "filename": "site_metadata_list.json"
+        "options": "?maxResults=100&cursor="
     },
     {
         "id": "groups_list",
         "method": "GET",
         "url": "https://ms-cell-002.api.lumapps.com/_ah/api/lumsites/v1/feed/list",
-        "options": "?maxResults=100&cursor=",
-        "filename": "groups_list.json"
+        "options": "?maxResults=100&cursor="
     },
     {
         "id": "users_group_list",
         "method": "GET",
         "url": "https://ms-cell-002.api.lumapps.com/_ah/api/lumsites/v1/feed/user/subscription/list",
-        "options": "?maxResults=100&fields=items.id&userId=",
-        "filename": "users_group_list.json"
+        "options": "?maxResults=100&fields=items.id&userId="
     },
     {
         "id": "users_list",
         "method": "GET",
         "url": "https://ms-cell-002.api.lumapps.com/_ah/api/lumsites/v1/user/list",
-        "options": "?maxResults=100&status=enabled&cursor=",
-        "filename": "users_list.json"
+        "options": "?maxResults=100&status=enabled&cursor="
     }
 ]
