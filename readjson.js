@@ -18,7 +18,8 @@ const api_configs = [
         "id": "content_list",
         "method": "POST",
         "url": "https://example.com/api/content/list",
-        "options": "?maxResult=100"
+        "options": "?maxResult=100",
+        "body" : "application/json"
     }
 ];
 
@@ -33,15 +34,13 @@ function getToken() {
 
 // 3.データ取得関数定義
 function retrieveData(_token, _config) {
-    console.log("データ取得開始");
+    console.log(`▪️▪️▪️ Initiate retrieval of ${_config.id} ... ▪️▪️▪️`);
     console.log(_token);
-    console.log(_config);
-    console.log("ID: " + _config.id);
-    console.log("HTTP Method: " + _config.method);
-    console.log("API Endpoint URL: " + _config.url);
-    console.log("API Options: " + _config.options);
-    console.log("File Name: " + _config.id + ".json");
-    console.log("データ取得終了");
+    console.log(`HTTP Method: ${_config.method}`);
+    console.log(`API Endpoint URL: ${_config.url}${_config.options}`);
+    console.log(`File Name: ${_config.id}.json`);
+    _config.method === "POST" ? console.log(`Body: ${_config.body}`) : null;
+    console.log(`▪️▪️▪️ Complete retrieval of ${_config.id} ! ▪️▪️▪️`);
 };
 
 // 4.メイン処理実行

@@ -11,7 +11,10 @@
         "url": "https://ms-cell-002.api.lumapps.com/_ah/api/lumsites/v1/content/list",
         "options": "?cursor=",
         "body": {
-            "lang": "en",
+            "lang": [
+                "en",
+                "ja"
+            ],
             "instanceId": [
                 "5730423981211648"
             ],
