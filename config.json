@@ -1,0 +1,16 @@
+[
+    {
+        "id": "user_list",
+        "method": "GET",
+        "url": "https:example.com/api",
+        "options": "",
+        "filename": "user_list.json"
+    },
+    {
+        "id": "content_list",
+        "method": "POST",
+        "url": "https:example.com/api",
+        "options": "",
+        "filename": "content_list.json"
+    }
+]

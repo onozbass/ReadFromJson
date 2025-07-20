@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON設定管理システム</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .control-panel {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        input, select, button {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            min-width: 120px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .log-container {
+            background: #1a1a1a;
+            color: #00ff00;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #333;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .log-success { color: #00ff00; }
+        .log-error { color: #ff4444; }
+        .log-warning { color: #ffaa00; }
+        .log-info { color: #4da6ff; }
+        
+        .result-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .config-display {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .config-id {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        .config-property {
+            margin: 5px 0;
+            padding: 5px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .clear-btn {
+            background: #dc3545;
+            margin-left: 10px;
+        }
+        
+        .clear-btn:hover {
+            background: #c82333;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 JSON設定管理システム</h1>
+        
+        <div class="control-panel">
+            <h3>設定操作パネル</h3>
+            <div class="input-group">
+                <input type="text" id="configId" placeholder="設定ID（例: database, cache, email）" style="flex: 1;">
+                <select id="operation">
+                    <option value="getById">IDで取得</option>
+                    <option value="getEnabled">有効な設定のみ</option>
+                    <option value="search">名前で検索</option>
+                    <option value="validate">バリデーション</option>
+                    <option value="async">非同期取得</option>
+                </select>
+                <button onclick="executeOperation()" id="executeBtn">実行</button>
+                <button onclick="clearLog()" class="clear-btn">ログクリア</button>
+            </div>
+            <div class="input-group">
+                <input type="text" id="searchTerm" placeholder="検索キーワード" style="display:none;">
+                <button onclick="showAllConfigs()">全設定表示</button>
+                <button onclick="showStats()">統計情報</button>
+                <button onclick="runDemo()">デモ実行</button>
+            </div>
+        </div>
+
+        <div class="stats-container" id="statsContainer" style="display:none;"></div>
+        
+        <div class="log-container" id="logContainer">
+            <div class="log-entry log-info">📋 システム初期化完了 - 設定管理システムが起動しました</div>
+        </div>
+        
+        <div class="result-container" id="resultContainer" style="display:none;">
+            <h3>実行結果</h3>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // サンプル設定データ
+        const configData = [
+            {
+                "id": "database",
+                "name": "データベース設定",
+                "host": "localhost",
+                "port": 3306,
+                "username": "admin",
+                "password": "secret123",
+                "enabled": true,
+                "type": "mysql"
+            },
+            {
+                "id": "cache",
+                "name": "キャッシュ設定",
+                "provider": "redis",
+                "host": "redis.example.com",
+                "port": 6379,
+                "ttl": 3600,
+                "enabled": true,
+                "type": "cache"
+            },
+            {
+                "id": "email",
+                "name": "メール設定",
+                "smtp": {
+                    "host": "smtp.gmail.com",
+                    "port": 587,
+                    "secure": false
+                },
+                "auth": {
+                    "user": "noreply@example.com",
+                    "pass": "app-password"
+                },
+                "enabled": false,
+                "type": "email"
+            },
+            {
+                "id": "logging",
+                "name": "ログ設定",
+                "level": "info",
+                "file": "./logs/app.log",
+                "maxSize": "10MB",
+                "maxFiles": 5,
+                "enabled": true,
+                "type": "logging"
+            },
+            {
+                "id": "api",
+                "name": "API設定",
+                "baseUrl": "https://api.example.com",
+                "timeout": 30000,
+                "retries": 3,
+                "rateLimit": {
+                    "requests": 100,
+                    "windowMs": 60000
+                },
+                "enabled": true,
+                "type": "api"
+            }
+        ];
+
+        // 設定管理クラス
+        class ConfigManager {
+            constructor(data) {
+                this.configs = data;
+                this.cache = new Map();
+                this.logToConsole('🚀 ConfigManager初期化完了', 'success');
+            }
+            
+            getById(id) {
+                this.logToConsole(`🔍 設定ID "${id}" を検索中...`, 'info');
+                
+                if (this.cache.has(id)) {
+                    this.logToConsole(`💾 キャッシュから取得: ${id}`, 'info');
+                    return this.cache.get(id);
+                }
+                
+                const config = this.configs.find(c => c.id === id);
+                
+                if (config) {
+                    this.cache.set(id, config);
+                    this.logToConsole(`✅ 設定取得成功: ${config.name}`, 'success');
+                } else {
+                    this.logToConsole(`❌ 設定が見つかりません: ${id}`, 'error');
+                }
+                
+                return config;
+            }
+            
+            getAllEnabled() {
+                this.logToConsole('🔍 有効な設定を検索中...', 'info');
+                const enabled = this.configs.filter(config => config.enabled);
+                this.logToConsole(`✅ ${enabled.length}件の有効な設定を発見`, 'success');
+                return enabled;
+            }
+            
+            searchByName(searchTerm) {
+                this.logToConsole(`🔍 名前で検索: "${searchTerm}"`, 'info');
+                const results = this.configs.filter(config => 
+                    config.name.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                this.logToConsole(`📊 検索結果: ${results.length}件`, 'success');
+                return results;
+            }
+            
+            validateConfig(id) {
+                this.logToConsole(`🔍 設定バリデーション開始: ${id}`, 'info');
+                const config = this.getById(id);
+                
+                if (!config) {
+                    this.logToConsole(`❌ バリデーション失敗: 設定が存在しません`, 'error');
+                    return false;
+                }
+                
+                const requiredFields = ['id', 'name', 'enabled'];
+                for (const field of requiredFields) {
+                    if (!(field in config)) {
+                        this.logToConsole(`❌ 必須フィールドが不足: ${field}`, 'error');
+                        return false;
+                    }
+                }
+                
+                this.logToConsole(`✅ バリデーション成功`, 'success');
+                return true;
+            }
+            
+            async getByIdAsync(id) {
+                this.logToConsole(`🔄 非同期取得開始: ${id}`, 'info');
+                
+                // 非同期処理をシミュレート
+                await this.delay(1000);
+                
+                const config = this.getById(id);
+                this.logToConsole(`⚡ 非同期取得完了`, 'success');
+                return config;
+            }
+            
+            getStats() {
+                const stats = {
+                    total: this.configs.length,
+                    enabled: this.configs.filter(c => c.enabled).length,
+                    disabled: this.configs.filter(c => !c.enabled).length,
+                    types: [...new Set(this.configs.map(c => c.type))].length
+                };
+                
+                this.logToConsole(`📊 統計情報を生成しました`, 'info');
+                return stats;
+            }
+            
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            
+            logToConsole(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                addLog(`[${timestamp}] ${message}`, type);
+            }
+        }
+
+        // ConfigManagerインスタンス
+        const configManager = new ConfigManager(configData);
+
+        // ログ表示関数
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.textContent = message;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // 結果表示関数
+        function showResult(data, title = '実行結果') {
+            const resultContainer = document.getElementById('resultContainer');
+            const resultContent = document.getElementById('resultContent');
+            
+            resultContainer.style.display = 'block';
+            
+            if (Array.isArray(data)) {
+                resultContent.innerHTML = `
+                    <h4>${title} (${data.length}件)</h4>
+                    ${data.map(config => formatConfig(config)).join('')}
+                `;
+            } else if (data && typeof data === 'object') {
+                resultContent.innerHTML = `
+                    <h4>${title}</h4>
+                    ${formatConfig(data)}
+                `;
+            } else {
+                resultContent.innerHTML = `
+                    <h4>${title}</h4>
+                    <p>${data || '結果がありません'}</p>
+                `;
+            }
+        }
+
+        // 設定フォーマット関数
+        function formatConfig(config) {
+            if (!config) return '<p>設定が見つかりません</p>';
+            
+            return `
+                <div class="config-display">
+                    <div class="config-id">${config.id} - ${config.name}</div>
+                    ${Object.entries(config)
+                        .filter(([key]) => key !== 'id' && key !== 'name')
+                        .map(([key, value]) => `
+                            <div class="config-property">
+                                <strong>${key}:</strong> 
+                                ${typeof value === 'object' ? JSON.stringify(value, null, 2) : value}
+                            </div>
+                        `).join('')}
+                </div>
+            `;
+        }
+
+        // メイン実行関数
+        async function executeOperation() {
+            const configId = document.getElementById('configId').value.trim();
+            const operation = document.getElementById('operation').value;
+            const executeBtn = document.getElementById('executeBtn');
+            
+            if (!configId && ['getById', 'validate', 'async'].includes(operation)) {
+                addLog('❌ 設定IDを入力してください', 'error');
+                return;
+            }
+
+            executeBtn.disabled = true;
+            executeBtn.innerHTML = '実行中... <div class="loading"></div>';
+            
+            try {
+                let result;
+                
+                switch (operation) {
+                    case 'getById':
+                        result = configManager.getById(configId);
+                        showResult(result, `ID "${configId}" の設定`);
+                        break;
+                        
+                    case 'getEnabled':
+                        result = configManager.getAllEnabled();
+                        showResult(result, '有効な設定一覧');
+                        break;
+                        
+                    case 'search':
+                        const searchTerm = configId || '設定';
+                        result = configManager.searchByName(searchTerm);
+                        showResult(result, `"${searchTerm}" の検索結果`);
+                        break;
+                        
+                    case 'validate':
+                        const isValid = configManager.validateConfig(configId);
+                        showResult(isValid ? '✅ バリデーション成功' : '❌ バリデーション失敗', 'バリデーション結果');
+                        break;
+                        
+                    case 'async':
+                        addLog('⏳ 非同期処理を開始します（1秒待機）', 'info');
+                        result = await configManager.getByIdAsync(configId);
+                        showResult(result, `非同期取得: "${configId}"`);
+                        break;
+                }
+            } catch (error) {
+                addLog(`❌ エラーが発生しました: ${error.message}`, 'error');
+            } finally {
+                executeBtn.disabled = false;
+                executeBtn.innerHTML = '実行';
+            }
+        }
+
+        // 全設定表示
+        function showAllConfigs() {
+            addLog('📋 全設定を表示します', 'info');
+            showResult(configData, '全設定一覧');
+        }
+
+        // 統計情報表示
+        function showStats() {
+            const stats = configManager.getStats();
+            const statsContainer = document.getElementById('statsContainer');
+            
+            statsContainer.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${stats.total}</div>
+                    <div>総設定数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.enabled}</div>
+                    <div>有効設定</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.disabled}</div>
+                    <div>無効設定</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.types}</div>
+                    <div>設定タイプ数</div>
+                </div>
+            `;
+            
+            statsContainer.style.display = 'grid';
+            addLog('📊 統計情報を表示しました', 'success');
+        }
+
+        // デモ実行
+        async function runDemo() {
+            addLog('🎬 デモ実行を開始します', 'info');
+            
+            const demoSteps = [
+                { id: 'database', operation: 'getById' },
+                { id: 'cache', operation: 'validate' },
+                { id: '', operation: 'getEnabled' },
+                { id: 'api', operation: 'async' }
+            ];
+            
+            for (const step of demoSteps) {
+                document.getElementById('configId').value = step.id;
+                document.getElementById('operation').value = step.operation;
+                await executeOperation();
+                await configManager.delay(1500);
+            }
+            
+            showStats();
+            addLog('🎉 デモ実行が完了しました', 'success');
+        }
+
+        // ログクリア
+        function clearLog() {
+            const logContainer = document.getElementById('logContainer');
+            logContainer.innerHTML = '<div class="log-entry log-info">📋 ログをクリアしました</div>';
+            
+            const resultContainer = document.getElementById('resultContainer');
+            resultContainer.style.display = 'none';
+            
+            const statsContainer = document.getElementById('statsContainer');
+            statsContainer.style.display = 'none';
+        }
+
+        // 操作変更時の処理
+        document.getElementById('operation').addEventListener('change', function() {
+            const searchInput = document.getElementById('searchTerm');
+            if (this.value === 'search') {
+                searchInput.style.display = 'block';
+                searchInput.placeholder = '検索キーワード';
+            } else {
+                searchInput.style.display = 'none';
+            }
+        });
+
+        // エンターキーで実行
+        document.getElementById('configId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                executeOperation();
+            }
+        });
+
+        // 初期化完了ログ
+        addLog('🌟 JSON設定管理システムが準備完了しました', 'success');
+        addLog('💡 設定ID例: database, cache, email, logging, api', 'info');
+    </script>
+</body>
+</html>
