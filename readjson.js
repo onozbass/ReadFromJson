@@ -28,7 +28,7 @@ function getConfigById(id) {
     return configs.find(config => config.id === id);
 }
 
-// 使用例
+/* // 使用例
 let config;
 config = getConfigById('user_list');
 console.log(config.method);
@@ -38,7 +38,7 @@ console.log(config.filename);
 config = getConfigById('content_list');
 console.log(config.method);
 console.log(config.url + config.options);
-console.log(config.filename);
+console.log(config.filename); */
 
 // 2.トークン取得関数定義
 function getToken() {
